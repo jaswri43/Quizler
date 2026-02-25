@@ -1,0 +1,92 @@
+body {
+  padding-top: 4.5rem; /* Makes sure site starts below navbar */
+}
+
+/* Navbar styling */
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #333;
+  z-index: 1000;
+}
+
+.navbar-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1rem 1.25rem;
+
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+}
+
+.navbar-left {
+  justify-self: start;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.navbar-center {
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+
+  padding: 0 1rem;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  white-space: nowrap;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 1rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.navbar a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.navbar-left .navbar-logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+  text-decoration: none;
+}
+
+.navbar-center .navbar-links {
+  list-style-type: none;
+  display: flex;
+  margin: 0;
+  padding: 0;
+  width: max-content;
+}
+
+.navbar-center .navbar-links li {
+  margin: 1rem;
+}
+
+.navbar-center .navbar-links a {
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Home page styling */
+.app-title {
+  display: center;
+  text-align: center;
+  margin-top: 2rem;
+  color: red;
+}
