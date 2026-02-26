@@ -2,15 +2,24 @@
 
 Quizler is a gamified flashcard-based studying application designed to help users stay motivated and consistent while learning. By incorporating game-inspired elements such as XP, levels, streaks, and achievements, the app makes studying progress visible and rewarding.
 
-## How to run
+## How to run frontend
+### First time setup
 - Install Node.js
-- Test they are installed by running 'node -v' and 'npm -v' in command line
+- Test it's are installed by running 'node -v' and 'npm -v' in command line
 - If you get a problem with 'npm -v' then open powershell as administrator and run 'Set-ExecutionPolicy RemoteSigned'
-- Open a terminal in the main project file
+- Open a terminal in the frontend file (.../Quizler/frontend)
 - Type npm install
+### Every time setup
 - Type npm run dev
 - Click the localhost link
 - Updates made in code will automatically appear on the site
+
+## How to run backend
+### First time setup
+- Open a terminal in the backend file (.../Quizler/backend)
+- Run 'pip install -r requirements.txt'
+### Every time setup
+- Run 'python app.py' from backend file
 
 ## Features
 - User authentication with role-based access (user & admin)
