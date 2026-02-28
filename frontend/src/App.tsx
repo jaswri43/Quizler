@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import './App.css'
 import Navbar from './components/Navbar.tsx';
+import HeroSection from './components/HeroSection.tsx';
+import RecentLevelups from './components/RecentLevelups.tsx';
 
 const navLinks = [
-    { label: 'Home', href: '/' },
+    { label: 'Social', href: '/social' },
     { label: 'Decks', href: '/decks' },
-    { label: 'Contact', href: '/contact' },
+    { label: 'Games', href: '/games' },
 ];
 
 function App() {
@@ -13,6 +15,8 @@ function App() {
     <>
       <div>
         <Navbar title="Quizzler" links={navLinks} />
+        <HeroSection />
+        <RecentLevelups />
       </div>
     </>
   )
