@@ -10,7 +10,7 @@ Quizler is a gamified flashcard-based studying application designed to help user
 - Open a terminal in the frontend file (.../Quizler/frontend)
 - Type npm install
 ### Every time setup
-- Type npm run dev
+- Type 'npm run dev' from frontend file
 - Click the localhost link
 - Updates made in code will automatically appear on the site
 

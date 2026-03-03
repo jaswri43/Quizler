@@ -14,7 +14,7 @@ function App() {
   return (
     <>
       <div>
-        <Navbar title="Quizzler" links={navLinks} />
+        <Navbar title="Quizler" links={navLinks} />
         <HeroSection />
         <RecentLevelups />
       </div>

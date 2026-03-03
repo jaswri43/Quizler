@@ -1,8 +1,13 @@
+:root {
+  --nav-height: 4.5rem;
+  --levelups-height: 5.5rem;
+}
+
 body {
-  padding-top: 4.5rem; /* Makes sure site starts below navbar */
+  padding-top: var(--nav-height); /* Makes sure site starts below navbar */
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  min-height: 100dvh;
   overflow: hidden;
 }
 
@@ -10,7 +15,8 @@ body {
   display: flex;
   flex-direction: column;
   flex: 1;
-  padding-bottom: 5.5rem; /* Makes sure content doesn't go behind levelups bar */
+  min-height: 100dvh;
+  padding-bottom: var(--levelups-height); /* Makes sure content doesn't go behind levelups bar */
 }
 
 /* Navbar styling */
@@ -100,8 +106,9 @@ body {
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: calc(100vh - 4.5rem - 5.5rem);
-  padding: 2rem;
+  height: calc(100dvh - var(--nav-height) - var(--levelups-height));
+  padding: 0 2rem;
+  box-sizing: border-box;
   flex-shrink: 0;
 }
 
@@ -169,7 +176,7 @@ body {
   left: 0;
   width: 100%;
   background-color: #0A2463;
-  padding: 1.5rem 0;
+  padding: 1rem 0;
   border-top: 2px solid #FF6600;
   overflow: hidden;
   box-sizing: border-box;
@@ -178,10 +185,16 @@ body {
 
 .levelups-scroll {
   display: flex;
-  gap: 1rem;
+  width: max-content;
+  animation: scroll-continuous 30s linear infinite;
+  will-change: transform;
+}
+
+.levelups-group {
+  display: flex;
+  gap: 2.5rem;
   padding: 0 1rem;
-  animation: scroll-continuous 12.5s linear infinite;
-  width: 100%;
+  flex-shrink: 0;
   box-sizing: border-box;
 }
 

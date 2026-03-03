@@ -13,21 +13,20 @@ export default function RecentLevelups() {
     { name: "Study Sidekick", level: 16 },
   ];
 
-  // Duplicate the list enough times to ensure seamless infinite scrolling
-  const duplicatedUsers = Array(20)
-    .fill(null)
-    .flatMap(() => recentUsers);
-
   return (
     <section className="levelups-section">
       <div className="levelups-scroll">
-        {duplicatedUsers.map((user, index) => (
-          <div key={index} className="levelup-card">
-            <div className="levelup-name">{user.name}</div>
-            <div className="levelup-level">Level {user.level}</div>
+        {[0, 1].map((group) => (
+          <div key={group} className="levelups-group" aria-hidden={group === 1}>
+            {recentUsers.map((user, index) => (
+              <div key={`${group}-${index}`} className="levelup-card">
+                <div className="levelup-name">{user.name}</div>
+                <div className="levelup-level">Level {user.level}</div>
+              </div>
+            ))}
           </div>
         ))}
       </div>
     </section>
   );
-}
+} 
