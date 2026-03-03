@@ -1,3 +1,5 @@
+import { Link, NavLink as RouterNavLink } from 'react-router-dom';
+
 // individuual links in navbar
 type NavLink = {
     label: string;
@@ -15,27 +17,27 @@ function Navbar({links, title}: NavbarProps) {
     <nav className="navbar">
         <div className="navbar-inner">
             <div className="navbar-left">
-                <a href="/" className="navbar-logo">
+                <Link to="/" className="navbar-logo">
                     {title}
-                </a>
+                </Link>
             </div>
 
             <div className="navbar-center">
                 <ul className="navbar-links">
                     {links.map((link) => (
                     <li key={link.href}>
-                        <a href={link.href}>
+                        <RouterNavLink to={link.href}>
                             {link.label}
-                        </a>
+                        </RouterNavLink>
                     </li>
                     ))}
                 </ul>
             </div>
 
             <div className="navbar-right">
-                <a href="/login" className="user-icon">
+                <Link to="/login" className="user-icon">
                     Login
-                </a>
+                </Link>
             </div>
         </div>
     </nav>
