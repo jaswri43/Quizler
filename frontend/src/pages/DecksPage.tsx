@@ -1,4 +1,4 @@
-export default function DedcksPage() {
+export default function DecksPage() {
 	return (
 		<section className="hero-section">
 			<div className="hero-content">
