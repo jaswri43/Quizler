@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flasgger import Swagger
 import os
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -8,8 +9,20 @@ from routes.flashcards import cards_bp
 load_dotenv()
 app = Flask(__name__)
 CORS(app)
+swagger = Swagger(app)
 
 app.register_blueprint(cards_bp)
+
+@app.get("/health")
+def health():
+    """
+    Health check
+    ---
+    responses:
+      200:
+        description: API is healthy
+    """
+    return {"status": "ok"}
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
