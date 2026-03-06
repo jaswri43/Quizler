@@ -5,7 +5,7 @@ Quizler is a gamified flashcard-based studying application designed to help user
 ## How to run frontend
 ### First time setup
 - Install Node.js
-- Test it's are installed by running 'node -v' and 'npm -v' in command line
+- Test that it is installed by running 'node -v' and 'npm -v' in command line
 - If you get a problem with 'npm -v' then open powershell as administrator and run 'Set-ExecutionPolicy RemoteSigned'
 - Open a terminal in the frontend file (.../Quizler/frontend)
 - Type npm install
