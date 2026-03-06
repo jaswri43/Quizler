@@ -11,7 +11,23 @@ supabase = create_client(url, key)
 
 cards_bp = Blueprint('cards', __name__)
 
+#Creates a new deck
+@cards_bp.route('/api/decks', methods=['POST'])
+def create_deck():
+    data = request.json
+    title = data.get('title')
 
+    if not title:
+        return jsonify({"error": "Deck title is required"}), 400
+
+    try:
+        response = supabase.table("Decks").insert({"title": title}).execute()
+        return jsonify({"message": "Deck created successfully!", "data": response.data}), 201
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+# Adds a card to a deck
 @cards_bp.route('/api/add-card', methods=['POST'])
 def add_card():
     data = request.json
@@ -74,13 +90,64 @@ def update_card(card_id):
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
+#Rename the deck
+@cards_bp.route('/api/decks/<deck_id>', methods=['PUT'])
+def rename_deck(deck_id):
+    data = request.json
+    new_title = data.get('title')
+
+    if not new_title:
+        return jsonify({"error": "New title is required"}), 400
+
+    try:
+        response = supabase.table("Decks").update({"title": new_title}).eq("id", deck_id).execute()
+
+        if not response.data:
+            return jsonify({"error": "Deck not found"}), 404
+
+        return jsonify({"message": "Deck renamed successfully!", "data": response.data}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+#Deck Stuff Below This Line
+
+
+
 #Returns a list of Flashcard Decks
 @cards_bp.route('/api/decks', methods=['GET'])
 def get_decks():
     try:
-        # Pulls every deck from your Decks table
         response = supabase.table("Decks").select("*").execute()
         return jsonify({"status": "success", "data": response.data}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
+
+
+@cards_bp.route('/api/decks/<deck_id>', methods=['DELETE'])
+def delete_deck(deck_id):
+    try:
+        response = supabase.table("Decks").delete().eq("id", deck_id).execute()
+
+        if not response.data:
+            return jsonify({"error": "Deck not found"}), 404
+
+        return jsonify({"message": "Deck and all its cards deleted successfully!", "data": response.data}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+#Pulls a single deck from the database
+@cards_bp.route('/api/decks/<deck_id>', methods=['GET'])
+def get_single_deck(deck_id):
+    try:
+        response = supabase.table("Decks").select("*").eq("id", deck_id).execute()
+
+        if not response.data:
+            return jsonify({"error": "Deck not found"}), 404
+
+
+        return jsonify({"status": "success", "data": response.data[0]}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
