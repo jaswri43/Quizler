@@ -11,3 +11,13 @@ CREATE TABLE "Flashcards" (
                               back TEXT NOT NULL,
                               deck_id UUID REFERENCES "Decks"(id) ON DELETE CASCADE
 );
+
+-- Creates the Users table to store XP, level, and streak data
+CREATE TABLE "Users" (
+                        id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+                        username TEXT NOT NULL UNIQUE,
+                        xp INTEGER DEFAULT 0,
+                        level INTEGER DEFAULT 1,
+                        streak INTEGER DEFAULT 0,
+                        PRIMARY KEY (id)
+);
