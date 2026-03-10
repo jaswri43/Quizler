@@ -11,19 +11,27 @@ supabase = create_client(url, key)
 
 auth_bp = Blueprint('auth', __name__)
 
-# Registers a new user
+# Registers a new user with email, password, and username
 @auth_bp.route('/api/register', methods=['POST'])
 def register():
     data = request.json
     email = data.get('email')
     password = data.get('password')
+    username = data.get('username')
 
-    if not email or not password:
-        return jsonify({"error": "Email and password are required"}), 400
+    if not email or not password or not username:
+        return jsonify({"error": "Email, password and username are required"}), 400
 
     try:
-        response = supabase.auth.sign_up({"email": email, "password": password})
-        return jsonify({"message": "Registration successful!", "user": response.user.email}), 201
+        auth_response = supabase.auth.sign_up({"email": email, "password": password})
+        user_id = auth_response.user.id
+
+        supabase.table("Users").insert({
+            "id": user_id,
+            "username": username
+        }).execute()
+
+        return jsonify({"message": "Registration successful!", "user": email}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
@@ -55,3 +63,13 @@ def logout():
         return jsonify({"message": "Logged out successfully!"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+
+# Creates a user profile in the Users table after registration
+@auth_bp.route('/api/users', methods=['POST'])
+def create_profile():
+    data = request.json
+    username = data.get('username')
+    access_token = data.get('access_token')
+
+    if not username or not access_token:
+        return jsonify({"error": "Username and access token are required"}), 400
