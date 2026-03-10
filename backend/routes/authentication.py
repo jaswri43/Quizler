@@ -64,12 +64,15 @@ def logout():
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
-# Creates a user profile in the Users table after registration
-@auth_bp.route('/api/users', methods=['POST'])
-def create_profile():
-    data = request.json
-    username = data.get('username')
-    access_token = data.get('access_token')
+#Fetches the users profile from the database
+@auth_bp.route('/api/user/<user_id>', methods=['GET'])
+def get_user(user_id):
+    try:
+        response = supabase.table("Users").select("*").eq("id", user_id).execute()
 
-    if not username or not access_token:
-        return jsonify({"error": "Username and access token are required"}), 400
+        if not response.data:
+            return jsonify({"error": "User not found"}), 404
+
+        return jsonify({"status": "success", "data": response.data[0]}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500

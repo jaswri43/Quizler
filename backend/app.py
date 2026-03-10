@@ -17,6 +17,7 @@ app.register_blueprint(cards_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(leaderboard_bp)
 
+
 @app.get("/health")
 def health():
     """
