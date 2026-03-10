@@ -11,17 +11,11 @@ supabase = create_client(url, key)
 
 leaderboard_bp = Blueprint('leaderboard', __name__)
 
-# Returns top 10 users sorted by level (mock data until Users table is set up)
+# Returns top 10 users sorted by level
 @leaderboard_bp.route('/api/leaderboard', methods=['GET'])
 def get_leaderboard():
     try:
-        mock_data = [
-            {"username": "StudyMaster", "level": 25, "xp": 5000},
-            {"username": "QuizKing", "level": 24, "xp": 4800},
-            {"username": "LearningLion", "level": 23, "xp": 4600},
-            {"username": "BrainBoss", "level": 22, "xp": 4400},
-            {"username": "KnowledgeKnight", "level": 21, "xp": 4200},
-        ]
-        return jsonify({"status": "success", "data": mock_data}), 200
+        response = supabase.table("Users").select("username, xp, level").order("level", desc=True).limit(10).execute()
+        return jsonify({"status": "success", "data": response.data}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
