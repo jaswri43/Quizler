@@ -25,7 +25,17 @@ export default function LoginPage() {
       setMessage(data.message);
       if (isLogin) localStorage.setItem('access_token', data.access_token);
       if (isLogin) localStorage.setItem('user_id', data.user_id);
+
+      const userResponse = await fetch(`http://127.0.0.1:5000/api/user/${data.user_id}`);
+      const userData = await userResponse.json();
+
+      if (userResponse.ok) {
+        localStorage.setItem('username', userData.data.username);
+        window.dispatchEvent(new Event('authChange'));
+      }
+
       navigate('/decks')
+
     } else {
       setMessage(data.error);
     }
