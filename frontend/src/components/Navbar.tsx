@@ -49,7 +49,7 @@ function Navbar({links, title}: NavbarProps) {
             <div className="navbar-right">
                 {username ? (
                     <span className="user-icon" style={{ cursor: 'default' }}>
-                        Hello, {localStorage.getItem('username')}
+                        Hello {localStorage.getItem('username')}
                     </span>
                 ) : (
                     <Link to="/login" className="user-icon">
