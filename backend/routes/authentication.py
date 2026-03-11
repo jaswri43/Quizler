@@ -50,7 +50,8 @@ def login():
         return jsonify({
             "message": "Login successful!",
             "access_token": response.session.access_token,
-            "user": response.user.email
+            "user": response.user.email,
+            "user_id": response.user.id,
         }), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 401

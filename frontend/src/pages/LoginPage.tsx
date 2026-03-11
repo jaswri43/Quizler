@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginPage() {
+  const navigate = useNavigate()
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -22,6 +24,8 @@ export default function LoginPage() {
     if (response.ok) {
       setMessage(data.message);
       if (isLogin) localStorage.setItem('access_token', data.access_token);
+      if (isLogin) localStorage.setItem('user_id', data.user_id);
+      navigate('/decks')
     } else {
       setMessage(data.error);
     }

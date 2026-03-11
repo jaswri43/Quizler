@@ -66,6 +66,32 @@ def create_classroom():
 # Allows the student to join the class using the sign-up code
 @classrooms_bp.route('/api/join/<join_slug>', methods=['POST'])
 def join_classroom(join_slug):
+    """
+    Student joins a classroom using a join link.
+    ---
+    parameters:
+      - name: join_slug
+        in: path
+        type: string
+        required: true
+        description: The 6-character generated join code
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            student_id:
+              type: string
+              example: "123e4567-e89b-12d3-a456-426614174000"
+    responses:
+      200:
+        description: Successfully joined the classroom
+      400:
+        description: Missing data or already enrolled
+      404:
+        description: Invalid join link
+    """
     data = request.json
     student_id = data.get('student_id')
 
@@ -102,6 +128,28 @@ def join_classroom(join_slug):
 # Allows a teacher to assign a deck to all students in the class
 @classrooms_bp.route('/api/assignments', methods=['POST'])
 def assign_deck():
+    """
+    Teacher assigns a flashcard deck to a classroom.
+    ---
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            classroom_id:
+              type: string
+              example: "classroom-uuid-here"
+            deck_id:
+              type: string
+              example: "deck-uuid-here"
+    responses:
+      201:
+        description: Deck successfully assigned
+      400:
+        description: Missing data or already assigned
+    """
     data = request.json
     classroom_id = data.get('classroom_id')
     deck_id = data.get('deck_id')
@@ -130,6 +178,21 @@ def assign_deck():
 
 @classrooms_bp.route('/api/student/<student_id>/decks', methods=['GET'])
 def get_student_decks(student_id):
+    """
+    Get a list of all assigned decks for a student.
+    ---
+    parameters:
+      - name: student_id
+        in: path
+        type: string
+        required: true
+        description: The UUID of the student
+    responses:
+      200:
+        description: Returns a list of assigned decks
+      400:
+        description: Database error
+    """
     try:
         rosters = supabase.table("Rosters").select("classroom_id").eq("student_id", student_id).execute()
 

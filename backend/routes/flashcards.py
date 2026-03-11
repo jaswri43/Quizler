@@ -14,6 +14,27 @@ cards_bp = Blueprint('cards', __name__)
 #Creates a new deck
 @cards_bp.route('/api/decks', methods=['POST'])
 def create_deck():
+    """
+    Create a new flashcard deck.
+    ---
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            title:
+              type: string
+              example: "AP US History"
+    responses:
+      201:
+        description: Deck created successfully
+      400:
+        description: Missing title
+      500:
+        description: Server error
+    """
     data = request.json
     title = data.get('title')
 
@@ -30,6 +51,31 @@ def create_deck():
 # Adds a card to a deck
 @cards_bp.route('/api/add-card', methods=['POST'])
 def add_card():
+    """
+    Add a new flashcard to a specific deck.
+    ---
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            front:
+              type: string
+              example: "What year was the War of 1812?"
+            back:
+              type: string
+              example: "1812"
+            deck_id:
+              type: string
+              example: "deck-uuid-here"
+    responses:
+      201:
+        description: Card added successfully
+      400:
+        description: Missing front or back text
+    """
     data = request.json
     front_text = data.get('front')
     back_text = data.get('back')
@@ -49,6 +95,23 @@ def add_card():
 # Deletes the selected card from the deck/database
 @cards_bp.route('/api/cards/<int:card_id>', methods=['DELETE'])
 def delete_card(card_id):
+    """
+    Delete a specific flashcard.
+    ---
+    parameters:
+      - name: card_id
+        in: path
+        type: integer
+        required: true
+        description: The ID of the card to delete
+    responses:
+      200:
+        description: Card deleted successfully
+      404:
+        description: Card not found
+      500:
+        description: Server error
+    """
     try:
         # The .delete() method removes the row where the 'id' column matches the card_id we sent
         response = supabase.table("Flashcards").delete().eq("id", card_id).execute()
@@ -64,6 +127,21 @@ def delete_card(card_id):
 #Returns the card data from the database
 @cards_bp.route('/api/cards/<deck_id>', methods=['GET'])
 def get_cards(deck_id):
+    """
+    Get all flashcards for a specific deck.
+    ---
+    parameters:
+      - name: deck_id
+        in: path
+        type: string
+        required: true
+        description: The UUID of the deck
+    responses:
+      200:
+        description: Returns a list of cards
+      500:
+        description: Server error
+    """
     try:
         response = supabase.table("Flashcards").select("*").eq("deck_id", deck_id).execute()
         return jsonify({"status": "success", "data": response.data}), 200
@@ -73,6 +151,35 @@ def get_cards(deck_id):
 #Updates the flashcard data
 @cards_bp.route('/api/cards/<int:card_id>', methods=['PUT'])
 def update_card(card_id):
+    """
+    Update the front and back text of a specific flashcard.
+    ---
+    parameters:
+      - name: card_id
+        in: path
+        type: integer
+        required: true
+        description: The ID of the card to update
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            front:
+              type: string
+              example: "Updated front text"
+            back:
+              type: string
+              example: "Updated back text"
+    responses:
+      200:
+        description: Card updated successfully
+      404:
+        description: Card not found
+      500:
+        description: Server error
+    """
     data = request.json
     front_text = data.get('front')
     back_text = data.get('back')
