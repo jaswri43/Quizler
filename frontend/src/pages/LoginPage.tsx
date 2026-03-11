@@ -8,11 +8,15 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [message, setMessage] = useState('');
+  const [role, setRole] = useState('')
 
   const handleSubmit = async () => {
     const url = isLogin ? 'http://127.0.0.1:5000/api/login' : 'http://127.0.0.1:5000/api/register';
     const body: any = { email, password };
-    if (!isLogin) body.username = username;
+    if (!isLogin){
+      body.username = username;
+      body.role = role;
+    }
 
     const response = await fetch(url, {
       method: 'POST',
@@ -62,13 +66,25 @@ export default function LoginPage() {
             style={{ padding: '0.8rem', borderRadius: '8px', border: 'none', fontSize: '1rem' }}
           />
           {!isLogin && (
-            <input
-              type="text"
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              style={{ padding: '0.8rem', borderRadius: '8px', border: 'none', fontSize: '1rem' }}
-            />
+              <>
+                <input
+                    type="text"
+                    placeholder="Username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    style={{ padding: '0.8rem', borderRadius: '8px', border: 'none', fontSize: '1rem' }}
+                />
+                <select
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    className="login-input"
+                    style={{ padding: '0.8rem', borderRadius: '8px', border: 'none', fontSize: '1rem', color: role === '' ? '#666' : 'white' }}
+                >
+                  <option value="" disabled hidden>Role</option>
+                  <option value="student">I am a Student</option>
+                  <option value="teacher">I am a Teacher</option>
+                </select>
+              </>
           )}
         </div>
 
