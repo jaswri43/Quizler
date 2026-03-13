@@ -1,10 +1,124 @@
+import { useState, useEffect } from 'react';
+
 export default function DecksPage() {
-	return (
-		<section className="hero-section">
-			<div className="hero-content">
-				<h1>Decks</h1>
-				<p>Show available decks and manage your collections.</p>
-			</div>
-		</section>
-	);
+  const [decks, setDecks] = useState<any[]>([]);
+  const [selectedDeck, setSelectedDeck] = useState<any>(null);
+  const [cards, setCards] = useState<any[]>([]);
+  const [newDeckTitle, setNewDeckTitle] = useState('');
+  const [newCardFront, setNewCardFront] = useState('');
+  const [newCardBack, setNewCardBack] = useState('');
+
+  useEffect(() => {
+    fetchDecks();
+  }, []);
+
+  const fetchDecks = async () => {
+    const response = await fetch('http://127.0.0.1:5000/api/decks');
+    const data = await response.json();
+    setDecks(data.data);
+  };
+
+  const fetchCards = async (deck_id: string) => {
+    const response = await fetch(`http://127.0.0.1:5000/api/cards/${deck_id}`);
+    const data = await response.json();
+    setCards(data.data);
+  };
+
+  const createDeck = async () => {
+    if (!newDeckTitle) return;
+    await fetch('http://127.0.0.1:5000/api/decks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: newDeckTitle })
+    });
+    setNewDeckTitle('');
+    fetchDecks();
+  };
+
+  const deleteDeck = async (deck_id: string) => {
+    await fetch(`http://127.0.0.1:5000/api/decks/${deck_id}`, { method: 'DELETE' });
+    setSelectedDeck(null);
+    setCards([]);
+    fetchDecks();
+  };
+
+  const addCard = async () => {
+    if (!newCardFront || !newCardBack || !selectedDeck) return;
+    await fetch('http://127.0.0.1:5000/api/add-card', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ front: newCardFront, back: newCardBack, deck_id: selectedDeck.id })
+    });
+    setNewCardFront('');
+    setNewCardBack('');
+    fetchCards(selectedDeck.id);
+  };
+
+  const deleteCard = async (card_id: number) => {
+    await fetch(`http://127.0.0.1:5000/api/cards/${card_id}`, { method: 'DELETE' });
+    fetchCards(selectedDeck.id);
+  };
+
+  return (
+    <section className="hero-section">
+      <div className="hero-content" style={{ maxWidth: '800px', width: '100%' }}>
+        {!selectedDeck ? (
+          <>
+            <h1>Your Decks</h1>
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', justifyContent: 'center' }}>
+              <input
+                type="text"
+                placeholder="New deck title"
+                value={newDeckTitle}
+                onChange={(e) => setNewDeckTitle(e.target.value)}
+                style={{ padding: '0.8rem', borderRadius: '8px', border: 'none', fontSize: '1rem', flex: 1 }}
+              />
+              <button className="cta-button primary" onClick={createDeck}>Create Deck</button>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {decks.map((deck) => (
+                <div key={deck.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,168,232,0.15)', border: '1px solid #00A8E8', borderRadius: '8px', padding: '1rem 1.5rem' }}>
+                  <span style={{ color: '#fff', fontWeight: 600 }}>{deck.title}</span>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button className="cta-button primary" onClick={() => { setSelectedDeck(deck); fetchCards(deck.id); }}>Open</button>
+                    <button className="cta-button secondary" onClick={() => deleteDeck(deck.id)}>Delete</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <>
+            <button className="cta-button secondary" onClick={() => { setSelectedDeck(null); setCards([]); }} style={{ marginBottom: '1rem' }}>← Back to Decks</button>
+            <h1>{selectedDeck.title}</h1>
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <input
+                type="text"
+                placeholder="Front"
+                value={newCardFront}
+                onChange={(e) => setNewCardFront(e.target.value)}
+                style={{ padding: '0.8rem', borderRadius: '8px', border: 'none', fontSize: '1rem', flex: 1 }}
+              />
+              <input
+                type="text"
+                placeholder="Back"
+                value={newCardBack}
+                onChange={(e) => setNewCardBack(e.target.value)}
+                style={{ padding: '0.8rem', borderRadius: '8px', border: 'none', fontSize: '1rem', flex: 1 }}
+              />
+              <button className="cta-button primary" onClick={addCard}>Add Card</button>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {cards.map((card) => (
+                <div key={card.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,168,232,0.15)', border: '1px solid #00A8E8', borderRadius: '8px', padding: '1rem 1.5rem' }}>
+                  <span style={{ color: '#fff' }}><strong>{card.front}</strong> — {card.back}</span>
+                  <button className="cta-button secondary" onClick={() => deleteCard(card.id)}>Delete</button>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </section>
+  );
 }
