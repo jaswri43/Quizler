@@ -21,3 +21,27 @@ CREATE TABLE "Users" (
                         streak INTEGER DEFAULT 0,
                         PRIMARY KEY (id)
 );
+
+-- Creates the Classrooms table for teacher-created classrooms
+CREATE TABLE "Classrooms" (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    teacher_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    join_slug TEXT NOT NULL UNIQUE
+);
+
+-- Creates the Rosters table to track which students are in which classroom
+CREATE TABLE "Rosters" (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    classroom_id UUID REFERENCES "Classrooms"(id) ON DELETE CASCADE,
+    student_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    UNIQUE(classroom_id, student_id)
+);
+
+-- Creates the Assignments table to track which decks are assigned to which classroom
+CREATE TABLE "Assignments" (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    classroom_id UUID REFERENCES "Classrooms"(id) ON DELETE CASCADE,
+    deck_id UUID REFERENCES "Decks"(id) ON DELETE CASCADE,
+    UNIQUE(classroom_id, deck_id)
+);

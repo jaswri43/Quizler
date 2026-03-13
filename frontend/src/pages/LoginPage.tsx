@@ -78,8 +78,7 @@ export default function LoginPage() {
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
                     className="login-input"
-                    style={{ padding: '0.8rem', borderRadius: '8px', border: 'none', fontSize: '1rem', color: role === '' ? '#666' : 'white'
-                }}
+                    style={{ padding: '0.8rem', borderRadius: '8px', border: 'none', fontSize: '1rem', color: role === '' ? '#666' : 'white' }}
                 >
                   <option value="" disabled hidden>Role</option>
                   <option value="student">I am a Student</option>
