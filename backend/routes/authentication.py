@@ -90,3 +90,34 @@ def get_profile(user_id):
         return jsonify({"status": "success", "data": response.data[0]}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# Updates a user's XP and recalculates their level
+@auth_bp.route('/api/users/<user_id>/xp', methods=['PUT'])
+def update_xp(user_id):
+    data = request.json
+    xp_gained = data.get('xp_gained')
+
+    if not xp_gained:
+        return jsonify({"error": "xp_gained is required"}), 400
+
+    try:
+        current = supabase.table("Users").select("xp, level").eq("id", user_id).execute()
+
+        if not current.data:
+            return jsonify({"error": "User not found"}), 404
+
+        new_xp = current.data[0]['xp'] + xp_gained
+        new_level = (new_xp // 100) + 1
+
+        supabase.table("Users").update({
+            "xp": new_xp,
+            "level": new_level
+        }).eq("id", user_id).execute()
+
+        return jsonify({
+            "message": "XP updated!",
+            "xp": new_xp,
+            "level": new_level
+        }), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
