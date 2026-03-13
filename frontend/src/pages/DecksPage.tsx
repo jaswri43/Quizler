@@ -12,6 +12,13 @@ export default function DecksPage() {
     fetchDecks();
   }, []);
 
+  useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      window.location.href = '/login';
+    }
+  }, []);
+
   const fetchDecks = async () => {
     const response = await fetch('http://127.0.0.1:5000/api/decks');
     const data = await response.json();
