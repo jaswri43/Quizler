@@ -13,7 +13,7 @@ export default function LoginPage() {
   const handleSubmit = async () => {
     const url = isLogin ? 'http://127.0.0.1:5000/api/login' : 'http://127.0.0.1:5000/api/register';
     const body: any = { email, password };
-    if (!isLogin){
+    if (!isLogin) {
       body.username = username;
       body.role = role;
     }
@@ -27,10 +27,12 @@ export default function LoginPage() {
     const data = await response.json();
     if (response.ok) {
       setMessage(data.message);
-      if (isLogin) localStorage.setItem('access_token', data.access_token);
-      if (isLogin) localStorage.setItem('user_id', data.user_id);
+      if (isLogin) {
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('user_id', data.user_id);
+      }
 
-      const userResponse = await fetch(`http://127.0.0.1:5000/api/user/${data.user_id}`);
+      const userResponse = await fetch(`http://127.0.0.1:5000/api/users/${data.user_id}`);
       const userData = await userResponse.json();
 
       if (userResponse.ok) {
@@ -38,7 +40,7 @@ export default function LoginPage() {
         window.dispatchEvent(new Event('authChange'));
       }
 
-      navigate('/decks')
+      navigate('/')
 
     } else {
       setMessage(data.error);
@@ -66,25 +68,24 @@ export default function LoginPage() {
             style={{ padding: '0.8rem', borderRadius: '8px', border: 'none', fontSize: '1rem' }}
           />
           {!isLogin && (
-              <>
-                <input
-                    type="text"
-                    placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    style={{ padding: '0.8rem', borderRadius: '8px', border: 'none', fontSize: '1rem' }}
-                />
-                <select
-                    value={role}
-                    onChange={(e) => setRole(e.target.value)}
-                    className="login-input"
-                    style={{ padding: '0.8rem', borderRadius: '8px', border: 'none', fontSize: '1rem', color: role === '' ? '#666' : 'white' }}
-                >
-                  <option value="" disabled hidden>Role</option>
-                  <option value="student">I am a Student</option>
-                  <option value="teacher">I am a Teacher</option>
-                </select>
-              </>
+            <>
+              <input
+                type="text"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                style={{ padding: '0.8rem', borderRadius: '8px', border: 'none', fontSize: '1rem' }}
+              />
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                style={{ padding: '0.8rem', borderRadius: '8px', border: 'none', fontSize: '1rem', color: role === '' ? '#666' : 'white' }}
+              >
+                <option value="" disabled hidden>Role</option>
+                <option value="student">I am a Student</option>
+                <option value="teacher">I am a Teacher</option>
+              </select>
+            </>
           )}
         </div>
 
