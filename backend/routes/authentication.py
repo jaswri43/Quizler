@@ -77,3 +77,16 @@ def get_user(user_id):
         return jsonify({"status": "success", "data": response.data[0]}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+
+# Returns a user's profile data by their user ID
+@auth_bp.route('/api/users/<user_id>', methods=['GET'])
+def get_profile(user_id):
+    try:
+        response = supabase.table("Users").select("username, xp, level, streak").eq("id", user_id).execute()
+
+        if not response.data:
+            return jsonify({"error": "User not found"}), 404
+
+        return jsonify({"status": "success", "data": response.data[0]}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
