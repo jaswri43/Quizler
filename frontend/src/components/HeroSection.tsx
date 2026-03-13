@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function HeroSection() {
   const [profile, setProfile] = useState<any>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const user_id = localStorage.getItem('user_id');
@@ -30,8 +32,7 @@ export default function HeroSection() {
         )}
         <div className="cta-buttons">
           <button className="cta-button primary">Start Quiz</button>
-          <button className="cta-button secondary">Create Deck</button>
-          <button className="cta-button secondary">Browse Decks</button>
+          <button className="cta-button secondary" onClick={() => navigate('/decks')}>Browse Decks</button>
         </div>
       </div>
     </section>
