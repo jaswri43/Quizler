@@ -7,6 +7,9 @@ export default function DecksPage() {
   const [newDeckTitle, setNewDeckTitle] = useState('');
   const [newCardFront, setNewCardFront] = useState('');
   const [newCardBack, setNewCardBack] = useState('');
+  const [editingCardId, setEditingCardId] = useState<number | null>(null);
+  const [editFront, setEditFront] = useState('');
+  const [editBack, setEditBack] = useState('');
 
   useEffect(() => {
     fetchDecks();
@@ -47,6 +50,23 @@ export default function DecksPage() {
     setSelectedDeck(null);
     setCards([]);
     fetchDecks();
+  };
+
+  const startEditing = (card: any) => {
+    setEditingCardId(card.id);
+    setEditFront(card.front);
+    setEditBack(card.back);
+  };
+
+  const saveEdit = async (card_id: number) => {
+    if (!editFront || !editBack) return;
+    await fetch(`http://127.0.0.1:5000/api/cards/${card_id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ front: editFront, back: editBack })
+    });
+    setEditingCardId(null);
+    fetchCards(selectedDeck.id);
   };
 
   const addCard = async () => {
@@ -96,7 +116,7 @@ export default function DecksPage() {
           </>
         ) : (
           <>
-            <button className="cta-button secondary" onClick={() => { setSelectedDeck(null); setCards([]); }} style={{ marginBottom: '1rem' }}>← Back to Decks</button>
+            <button className="cta-button secondary" onClick={() => { setSelectedDeck(null); setCards([]); setEditingCardId(null); }} style={{ marginBottom: '1rem' }}>← Back to Decks</button>
             <h1>{selectedDeck.title}</h1>
             <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', justifyContent: 'center', flexWrap: 'wrap' }}>
               <input
@@ -117,10 +137,41 @@ export default function DecksPage() {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {cards.map((card) => (
-                <div key={card.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,168,232,0.15)', border: '1px solid #00A8E8', borderRadius: '8px', padding: '1rem 1.5rem' }}>
-                  <span style={{ color: '#fff' }}><strong>{card.front}</strong> — {card.back}</span>
-                  <button className="cta-button secondary" onClick={() => deleteCard(card.id)}>Delete</button>
-                </div>
+                  <div key={card.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,168,232,0.15)', border: '1px solid #00A8E8', borderRadius: '8px', padding: '1rem 1.5rem' }}>
+
+                    {editingCardId === card.id ? (
+                        <div style={{ display: 'flex', gap: '1rem', flex: 1, marginRight: '1rem' }}>
+                          <input
+                              type="text"
+                              value={editFront}
+                              onChange={(e) => setEditFront(e.target.value)}
+                              style={{ padding: '0.5rem', borderRadius: '4px', border: 'none', flex: 1 }}
+                          />
+                          <input
+                              type="text"
+                              value={editBack}
+                              onChange={(e) => setEditBack(e.target.value)}
+                              style={{ padding: '0.5rem', borderRadius: '4px', border: 'none', flex: 1 }}
+                          />
+                        </div>
+                    ) : (
+                        <span style={{ color: '#fff' }}><strong>{card.front}</strong> — {card.back}</span>
+                    )}
+
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      {editingCardId === card.id ? (
+                          <>
+                            <button className="cta-button primary" onClick={() => saveEdit(card.id)}>Save</button>
+                            <button className="cta-button secondary" onClick={() => setEditingCardId(null)}>Cancel</button>
+                          </>
+                      ) : (
+                          <>
+                            <button className="cta-button primary" onClick={() => startEditing(card)}>Edit</button>
+                            <button className="cta-button secondary" onClick={() => deleteCard(card.id)}>Delete</button>
+                          </>
+                      )}
+                    </div>
+                  </div>
               ))}
             </div>
           </>
