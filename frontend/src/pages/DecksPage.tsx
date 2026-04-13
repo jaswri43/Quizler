@@ -10,9 +10,11 @@ export default function DecksPage() {
   const [editingCardId, setEditingCardId] = useState<number | null>(null);
   const [editFront, setEditFront] = useState('');
   const [editBack, setEditBack] = useState('');
+  const [assignedDecks, setAssignedDecks] = useState<any[]>([]);
 
   useEffect(() => {
     fetchDecks();
+    fetchAssignedDecks();
   }, []);
 
   useEffect(() => {
@@ -26,6 +28,17 @@ export default function DecksPage() {
     const response = await fetch('http://127.0.0.1:5000/api/decks');
     const data = await response.json();
     setDecks(data.data);
+  };
+
+  const fetchAssignedDecks = async () => {
+    const user_id = localStorage.getItem('user_id');
+    if (!user_id) return;
+
+    const response = await fetch(`http://127.0.0.1:5000/api/assigned-decks/${user_id}`);
+    const data = await response.json();
+    if (data.data) {
+      setAssignedDecks(data.data);
+    }
   };
 
   const fetchCards = async (deck_id: string) => {
@@ -113,7 +126,36 @@ export default function DecksPage() {
                 </div>
               ))}
             </div>
-          </>
+
+
+          <hr style={{ border: '0', height: '1px', background: 'rgba(255,255,255,0.1)', margin: '3rem 0' }} />
+      <h1 style={{ marginTop: '0' }}>Assigned Decks</h1>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        {assignedDecks.length === 0 ? (
+            <p style={{ color: '#ccc', textAlign: 'center' }}>You have no assigned decks right now.</p>
+        ) : (
+            assignedDecks.map((deck) => (
+                <div key={deck.id} style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  background: 'rgba(255, 102, 0, 0.1)', // Subtle orange for distinction
+                  border: '1px solid #FF6600',
+                  borderRadius: '8px',
+                  padding: '1rem 1.5rem'
+                }}>
+                    <span style={{ color: '#fff', fontWeight: 600 }}>
+                      {deck.title} <span style={{ fontSize: '0.85rem', color: '#FF6600', marginLeft: '0.5rem' }}>(Assigned)</span>
+                    </span>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button className="cta-button primary" onClick={() => { setSelectedDeck(deck); fetchCards(deck.id); }}>Open</button>
+                  </div>
+                </div>
+            ))
+        )}
+      </div>
+    </>
         ) : (
           <>
             <button className="cta-button secondary" onClick={() => { setSelectedDeck(null); setCards([]); setEditingCardId(null); }} style={{ marginBottom: '1rem' }}>← Back to Decks</button>

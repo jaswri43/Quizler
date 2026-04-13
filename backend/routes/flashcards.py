@@ -258,3 +258,21 @@ def get_single_deck(deck_id):
         return jsonify({"status": "success", "data": response.data[0]}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+
+
+# Fetches all decks assigned to a specific student
+@cards_bp.route('/api/assigned-decks/<user_id>', methods=['GET'])
+def get_assigned_decks(user_id):
+    try:
+
+        assignments = supabase.table("Assignments").select("deck_id").eq("student_id", user_id).execute()
+        if not assignments.data:
+            return jsonify({"status": "success", "data": []}), 200
+
+        deck_ids = [item['deck_id'] for item in assignments.data]
+
+        assigned_decks = supabase.table("Decks").select("*").in_("id", deck_ids).execute()
+
+        return jsonify({"status": "success", "data": assigned_decks.data}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
