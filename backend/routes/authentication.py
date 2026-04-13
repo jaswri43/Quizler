@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 import os
 from supabase import create_client
 from dotenv import load_dotenv
+from datetime import datetime
 
 load_dotenv()
 
@@ -46,13 +47,49 @@ def login():
         return jsonify({"error": "Email and password are required"}), 400
 
     try:
+        # 1. Authenticate the user
         response = supabase.auth.sign_in_with_password({"email": email, "password": password})
+        user_id = response.user.id
+
+        # --- BEGIN STREAK LOGIC ---
+        # 2. Get today's date
+        today_str = datetime.now().strftime('%Y-%m-%d')
+        today_date = datetime.strptime(today_str, '%Y-%m-%d').date()
+
+        # 3. Fetch the user's current streak and last_login from the database
+        user_record_response = supabase.table("Users").select("streak, last_login").eq("id", user_id).execute()
+
+        if user_record_response.data:
+            user_record = user_record_response.data[0]
+            current_streak = user_record.get('streak') or 0
+            last_login_str = user_record.get('last_login')
+
+            new_streak = current_streak
+
+            if last_login_str:
+                last_login_date = datetime.strptime(last_login_str, '%Y-%m-%d').date()
+                days_passed = (today_date - last_login_date).days
+
+                if days_passed == 1:
+                    new_streak = current_streak + 1
+                elif days_passed > 1:
+                    new_streak = 1
+
+            else:
+                new_streak = 1
+
+            supabase.table("Users").update({
+                "streak": new_streak,
+                "last_login": today_str
+            }).eq("id", user_id).execute()
+
         return jsonify({
             "message": "Login successful!",
             "access_token": response.session.access_token,
             "user": response.user.email,
-            "user_id": response.user.id,
+            "user_id": user_id,
         }), 200
+
     except Exception as e:
         return jsonify({"error": str(e)}), 401
 
