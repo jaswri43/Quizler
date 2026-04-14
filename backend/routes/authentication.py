@@ -19,6 +19,7 @@ def register():
     email = data.get('email')
     password = data.get('password')
     username = data.get('username')
+    role = data.get('role', 'student')
 
     if not email or not password or not username:
         return jsonify({"error": "Email, password and username are required"}), 400
@@ -29,7 +30,8 @@ def register():
 
         supabase.table("Users").insert({
             "id": user_id,
-            "username": username
+            "username": username,
+            "role": role
         }).execute()
 
         return jsonify({"message": "Registration successful!", "user": email}), 201
@@ -119,7 +121,7 @@ def get_user(user_id):
 @auth_bp.route('/api/users/<user_id>', methods=['GET'])
 def get_profile(user_id):
     try:
-        response = supabase.table("Users").select("username, xp, level, streak").eq("id", user_id).execute()
+        response = supabase.table("Users").select("username, xp, level, streak, role").eq("id", user_id).execute()
 
         if not response.data:
             return jsonify({"error": "User not found"}), 404

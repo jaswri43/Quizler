@@ -37,12 +37,17 @@ def create_deck():
     """
     data = request.json
     title = data.get('title')
+    user_id = data.get('user_id')
+
 
     if not title:
         return jsonify({"error": "Deck title is required"}), 400
 
     try:
-        response = supabase.table("Decks").insert({"title": title}).execute()
+        response = supabase.table("Decks").insert({
+            "title": title,
+            "created_by": user_id
+        }).execute()
         return jsonify({"message": "Deck created successfully!", "data": response.data}), 201
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
@@ -142,6 +147,8 @@ def get_cards(deck_id):
       500:
         description: Server error
     """
+    user_id = request.args.get('user_id')
+
     try:
         response = supabase.table("Flashcards").select("*").eq("deck_id", deck_id).execute()
         return jsonify({"status": "success", "data": response.data}), 200
@@ -224,8 +231,14 @@ def rename_deck(deck_id):
 #Returns a list of Flashcard Decks
 @cards_bp.route('/api/decks', methods=['GET'])
 def get_decks():
+    user_id = request.args.get('user_id')
+
     try:
-        response = supabase.table("Decks").select("*").execute()
+        query = supabase.table("Decks").select("*")
+        if user_id:
+            query = query.eq("created_by", user_id)
+
+        response = query.execute();
         return jsonify({"status": "success", "data": response.data}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500

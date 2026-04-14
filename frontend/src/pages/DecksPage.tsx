@@ -11,21 +11,30 @@ export default function DecksPage() {
   const [editFront, setEditFront] = useState('');
   const [editBack, setEditBack] = useState('');
   const [assignedDecks, setAssignedDecks] = useState<any[]>([]);
+  const [userRole, setUserRole] = useState('student');
+  const [justAssignedId, setJustAssignedId] = useState<string | number | null>(null);
 
   useEffect(() => {
     fetchDecks();
     fetchAssignedDecks();
-  }, []);
 
-  useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    if (!token) {
-      window.location.href = '/login';
-    }
+    const fetchRole = async () => {
+      const user_id = localStorage.getItem('user_id');
+      if (!user_id) return;
+      const response = await fetch(`http://127.0.0.1:5000/api/users/${user_id}`);
+      const data = await response.json();
+      if (data.data && data.data.role) {
+        setUserRole(data.data.role);
+      }
+    };
+    fetchRole();
   }, []);
 
   const fetchDecks = async () => {
-    const response = await fetch('http://127.0.0.1:5000/api/decks');
+    const user_id = localStorage.getItem('user_id');
+    if (!user_id) return;
+
+    const response = await fetch(`http://127.0.0.1:5000/api/decks?user_id=${user_id}`);
     const data = await response.json();
     setDecks(data.data);
   };
@@ -52,7 +61,7 @@ export default function DecksPage() {
     await fetch('http://127.0.0.1:5000/api/decks', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: newDeckTitle })
+      body: JSON.stringify({ title: newDeckTitle, user_id: localStorage.getItem('user_id') })
     });
     setNewDeckTitle('');
     fetchDecks();
@@ -65,11 +74,32 @@ export default function DecksPage() {
     fetchDecks();
   };
 
+  const assignDeck = async (deck_id: string) => {
+    const response = await fetch('http://127.0.0.1:5000/api/assign-deck', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ deck_id })
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      setJustAssignedId(deck_id);
+      setTimeout(() => {
+        setJustAssignedId(null);
+      }, 1500);
+    } else {
+      alert("Error: " + data.error);
+    }
+  };
+
+
   const startEditing = (card: any) => {
     setEditingCardId(card.id);
     setEditFront(card.front);
     setEditBack(card.back);
   };
+
+
 
   const saveEdit = async (card_id: number) => {
     if (!editFront || !editBack) return;
@@ -118,11 +148,29 @@ export default function DecksPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {decks.map((deck) => (
                 <div key={deck.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,168,232,0.15)', border: '1px solid #00A8E8', borderRadius: '8px', padding: '1rem 1.5rem' }}>
-                  <span style={{ color: '#fff', fontWeight: 600 }}>{deck.title}</span>
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <span style={{ color: '#fff', fontWeight: 600, flex: 1, marginRight: '1rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {deck.title}
+                  </span>
+                  <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
                     <button className="cta-button primary" onClick={() => { setSelectedDeck(deck); fetchCards(deck.id); }}>Open</button>
+                    {userRole === 'teacher' && (
+                        <button
+                            className="cta-button primary"
+                            style={{
+                              backgroundColor: justAssignedId === deck.id ? '#28a745' : '#FF6600',
+                              borderColor: justAssignedId === deck.id ? '#28a745' : '#FF6600',
+                              transition: 'all 0.3s ease'
+                            }}
+                            onClick={() => assignDeck(deck.id)}
+                            disabled={justAssignedId === deck.id}
+                        >
+                          {justAssignedId === deck.id ? '✓ Done' : 'Assign'}
+                        </button>
+                    )}
+
                     <button className="cta-button secondary" onClick={() => deleteDeck(deck.id)}>Delete</button>
                   </div>
+
                 </div>
               ))}
             </div>
@@ -140,15 +188,15 @@ export default function DecksPage() {
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  background: 'rgba(255, 102, 0, 0.1)', // Subtle orange for distinction
+                  background: 'rgba(255, 102, 0, 0.1)',
                   border: '1px solid #FF6600',
                   borderRadius: '8px',
                   padding: '1rem 1.5rem'
                 }}>
-                    <span style={{ color: '#fff', fontWeight: 600 }}>
-                      {deck.title} <span style={{ fontSize: '0.85rem', color: '#FF6600', marginLeft: '0.5rem' }}>(Assigned)</span>
+                  <span style={{ color: '#fff', fontWeight: 600, flex: 1, marginRight: '1rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {deck.title} <span style={{ fontSize: '0.85rem', color: '#FF6600', marginLeft: '0.5rem' }}>(Assigned)</span>
                     </span>
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
                     <button className="cta-button primary" onClick={() => { setSelectedDeck(deck); fetchCards(deck.id); }}>Open</button>
                   </div>
                 </div>
