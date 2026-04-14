@@ -84,14 +84,31 @@ export default function DecksPage() {
     const data = await response.json();
     if (response.ok) {
       setJustAssignedId(deck_id);
+
       setTimeout(() => {
         setJustAssignedId(null);
-      }, 1500);
+        fetchAssignedDecks();
+      }, 1000);
+
     } else {
       alert("Error: " + data.error);
     }
   };
 
+  const unassignDeck = async (deck_id: string) => {
+    if (!window.confirm("Are you sure you want to unassign this deck? It will move back to 'Your Decks'.")) return;
+
+    const response = await fetch(`http://127.0.0.1:5000/api/unassign-deck/${deck_id}`, {
+      method: 'DELETE'
+    });
+
+    if (response.ok) {
+      fetchAssignedDecks();
+      fetchDecks();
+    } else {
+      alert("Failed to unassign deck.");
+    }
+  };
 
   const startEditing = (card: any) => {
     setEditingCardId(card.id);
@@ -146,32 +163,36 @@ export default function DecksPage() {
               <button className="cta-button primary" onClick={createDeck}>Create Deck</button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {decks.map((deck) => (
-                <div key={deck.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,168,232,0.15)', border: '1px solid #00A8E8', borderRadius: '8px', padding: '1rem 1.5rem' }}>
-                  <span style={{ color: '#fff', fontWeight: 600, flex: 1, marginRight: '1rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {deck.title}
-                  </span>
-                  <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
-                    <button className="cta-button primary" onClick={() => { setSelectedDeck(deck); fetchCards(deck.id); }}>Open</button>
-                    {userRole === 'teacher' && (
-                        <button
-                            className="cta-button primary"
-                            style={{
-                              backgroundColor: justAssignedId === deck.id ? '#28a745' : '#FF6600',
-                              borderColor: justAssignedId === deck.id ? '#28a745' : '#FF6600',
-                              transition: 'all 0.3s ease'
-                            }}
-                            onClick={() => assignDeck(deck.id)}
-                            disabled={justAssignedId === deck.id}
-                        >
-                          {justAssignedId === deck.id ? '✓ Done' : 'Assign'}
-                        </button>
-                    )}
+              {decks.filter(deck => !assignedDecks.some(assigned => assigned.id === deck.id)).map((deck) => (
+                  <div key={deck.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,168,232,0.15)', border: '1px solid #00A8E8', borderRadius: '8px', padding: '1rem 1.5rem' }}>
+      <span style={{ color: '#fff', fontWeight: 600, flex: 1, marginRight: '1rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        {deck.title}
+      </span>
 
-                    <button className="cta-button secondary" onClick={() => deleteDeck(deck.id)}>Delete</button>
+                    <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+                      {/* 1. Open Button */}
+                      <button className="cta-button primary" onClick={() => { setSelectedDeck(deck); fetchCards(deck.id); }}>Open</button>
+
+                      {/* 2. Assign Button (Only for Teachers) */}
+                      {userRole === 'teacher' && (
+                          <button
+                              className="cta-button primary"
+                              style={{
+                                backgroundColor: justAssignedId === deck.id ? '#28a745' : '#FF6600',
+                                borderColor: justAssignedId === deck.id ? '#28a745' : '#FF6600',
+                                transition: 'all 0.3s ease'
+                              }}
+                              onClick={() => assignDeck(deck.id)}
+                              disabled={justAssignedId === deck.id}
+                          >
+                            {justAssignedId === deck.id ? '✓ Done' : 'Assign'}
+                          </button>
+                      )}
+
+                      {/* 3. Delete Button */}
+                      <button className="cta-button secondary" onClick={() => deleteDeck(deck.id)}>Delete</button>
+                    </div>
                   </div>
-
-                </div>
               ))}
             </div>
 
@@ -198,7 +219,16 @@ export default function DecksPage() {
                     </span>
                     <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
                     <button className="cta-button primary" onClick={() => { setSelectedDeck(deck); fetchCards(deck.id); }}>Open</button>
-                  </div>
+                      {userRole === 'teacher' && (
+                          <button
+                              className="cta-button secondary"
+                              style={{ backgroundColor: 'transparent', border: '1px solid #FF6600', color: '#FF6600' }}
+                              onClick={() => unassignDeck(deck.id)}
+                          >
+                            Unassign
+                          </button>
+                      )}
+                    </div>
                 </div>
             ))
         )}

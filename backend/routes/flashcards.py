@@ -273,19 +273,54 @@ def get_single_deck(deck_id):
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
-# Fetches all decks assigned to a specific student
+
+# Fetches all globally assigned decks
 @cards_bp.route('/api/assigned-decks/<user_id>', methods=['GET'])
 def get_assigned_decks(user_id):
     try:
+        # Grab ALL rows from the Assignments table
+        assignments = supabase.table("Assignments").select("deck_id").execute()
 
-        assignments = supabase.table("Assignments").select("deck_id").eq("student_id", user_id).execute()
         if not assignments.data:
             return jsonify({"status": "success", "data": []}), 200
 
+        # Extract the list of deck IDs
         deck_ids = [item['deck_id'] for item in assignments.data]
 
+        # Fetch the actual deck details for those IDs
         assigned_decks = supabase.table("Decks").select("*").in_("id", deck_ids).execute()
 
         return jsonify({"status": "success", "data": assigned_decks.data}), 200
     except Exception as e:
+        print("Crash error:", str(e))
         return jsonify({"status": "error", "message": str(e)}), 500
+
+# Assigns a deck globally to all students
+@cards_bp.route('/api/assign-deck', methods=['POST'])
+def assign_deck():
+    data = request.json
+    deck_id = data.get('deck_id')
+
+    if not deck_id:
+        return jsonify({"error": "Deck ID is required"}), 400
+
+    try:
+        response = supabase.table("Assignments").insert({
+            "deck_id": deck_id
+        }).execute()
+
+        return jsonify({"message": "Deck assigned to all students!"}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Removes a deck from the global assignments
+@cards_bp.route('/api/unassign-deck/<deck_id>', methods=['DELETE'])
+def unassign_deck(deck_id):
+    try:
+    
+        response = supabase.table("Assignments").delete().eq("deck_id", deck_id).execute()
+
+        return jsonify({"message": "Deck unassigned successfully!"}), 200
+    except Exception as e:
+        print(f"Unassign Error: {e}")
+        return jsonify({"error": str(e)}), 500
