@@ -24,15 +24,24 @@ export default function StudyPage() {
     try {
       setError(null);
       const user_id = localStorage.getItem('user_id');
-      const url = user_id
-        ? `http://127.0.0.1:5000/api/decks?user_id=${user_id}`
-        : 'http://127.0.0.1:5000/api/decks';
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Deck fetch failed: ${response.status}`);
-      }
-      const data = await response.json();
-      setDecks(Array.isArray(data.data) ? data.data : []);
+      if (!user_id) return;
+
+      // 1. Fetch the Teacher's Global Assigned Decks
+      const assignedResponse = await fetch(`http://127.0.0.1:5000/api/assigned-decks/${user_id}`);
+      const assignedData = await assignedResponse.json();
+      const assigned = Array.isArray(assignedData.data) ? assignedData.data : [];
+
+      // 2. Fetch the Student's Personal Decks
+      const personalResponse = await fetch(`http://127.0.0.1:5000/api/decks?user_id=${user_id}`);
+      const personalData = await personalResponse.json();
+      const personal = Array.isArray(personalData.data) ? personalData.data : [];
+
+      // 3. Combine them! (Using a Set to remove any accidental duplicates)
+      const combinedDecks = [...assigned, ...personal];
+      const uniqueDecks = Array.from(new Set(combinedDecks.map(a => a.id)))
+          .map(id => combinedDecks.find(a => a.id === id));
+
+      setDecks(uniqueDecks);
     } catch (fetchError) {
       console.error('Error fetching decks:', fetchError);
       setError('Unable to load decks. Please refresh the page.');
