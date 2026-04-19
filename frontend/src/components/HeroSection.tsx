@@ -73,7 +73,7 @@ export default function HeroSection() {
           </>
         )}
         <div className="cta-buttons">
-          <button className="cta-button primary">Start Quiz</button>
+          <button className="cta-button primary" onClick={() => navigate('/games')}>Start Quiz</button>
           <button className="cta-button secondary" onClick={() => navigate('/decks')}>Browse Decks</button>
         </div>
         {profile && <StreakBonusTracker currentStreak={profile.streak} />}
