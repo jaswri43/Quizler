@@ -1,10 +1,119 @@
+import { useState, useEffect } from 'react';
+
 export default function GamesPage() {
-	return (
-		<section className="hero-section">
-			<div className="hero-content">
-				<h1>Games</h1>
-				<p>Show available games and manage your collections.</p>
-			</div>
-		</section>
-	);
+  const [decks, setDecks] = useState<any[]>([]);
+  const [selectedDeck, setSelectedDeck] = useState<any>(null);
+  const [cards, setCards] = useState<any[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [flipped, setFlipped] = useState(false);
+  const [finished, setFinished] = useState(false);
+  const [xpGained, setXpGained] = useState(0);
+
+  useEffect(() => {
+    const user_id = localStorage.getItem('user_id');
+    if (!user_id) {
+      window.location.href = '/login';
+      return;
+    }
+    fetchDecks();
+  }, []);
+
+  const fetchDecks = async () => {
+    const user_id = localStorage.getItem('user_id');
+    const response = await fetch(`http://127.0.0.1:5000/api/decks?user_id=${user_id}`);
+    const data = await response.json();
+    setDecks(data.data);
+  };
+
+  const startGame = async (deck: any) => {
+    const response = await fetch(`http://127.0.0.1:5000/api/cards/${deck.id}`);
+    const data = await response.json();
+    setSelectedDeck(deck);
+    setCards(data.data);
+    setCurrentIndex(0);
+    setFlipped(false);
+    setFinished(false);
+  };
+
+  const nextCard = () => {
+    if (currentIndex + 1 >= cards.length) {
+      finishGame();
+    } else {
+      setCurrentIndex(currentIndex + 1);
+      setFlipped(false);
+    }
+  };
+
+  const finishGame = async () => {
+    const user_id = localStorage.getItem('user_id');
+    const xp = cards.length * 10;
+    await fetch(`http://127.0.0.1:5000/api/users/${user_id}/xp`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ xp_gained: xp })
+    });
+    setXpGained(xp);
+    setFinished(true);
+  };
+
+  return (
+    <section className="hero-section">
+      <div className="hero-content" style={{ maxWidth: '700px', width: '100%' }}>
+
+        {/* Deck selection screen */}
+        {!selectedDeck && (
+          <>
+            <h1>Study Mode</h1>
+            <p>Pick a deck to study</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
+              {decks.map((deck) => (
+                <div key={deck.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,168,232,0.15)', border: '1px solid #00A8E8', borderRadius: '8px', padding: '1rem 1.5rem' }}>
+                  <span style={{ color: '#fff', fontWeight: 600 }}>{deck.title}</span>
+                  <button className="cta-button primary" onClick={() => startGame(deck)}>Study</button>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* Finished screen */}
+        {selectedDeck && finished && (
+          <>
+            <h1>🎉 Nice Work!</h1>
+            <p>You studied all {cards.length} cards in <strong>{selectedDeck.title}</strong></p>
+            <p style={{ color: '#FF6600', fontSize: '1.5rem', fontWeight: 700 }}>+{xpGained} XP earned!</p>
+            <div className="cta-buttons" style={{ marginTop: '1.5rem' }}>
+              <button className="cta-button primary" onClick={() => startGame(selectedDeck)}>Study Again</button>
+              <button className="cta-button secondary" onClick={() => { setSelectedDeck(null); setFinished(false); }}>Back to Decks</button>
+            </div>
+          </>
+        )}
+
+        {/* Card study screen */}
+        {selectedDeck && !finished && cards.length > 0 && (
+          <>
+            <p style={{ color: '#ccc', marginBottom: '0.5rem' }}>Card {currentIndex + 1} of {cards.length} — {selectedDeck.title}</p>
+            <div
+              onClick={() => setFlipped(!flipped)}
+              style={{ background: flipped ? 'rgba(255,102,0,0.15)' : 'rgba(0,168,232,0.15)', border: flipped ? '1px solid #FF6600' : '1px solid #00A8E8', borderRadius: '12px', padding: '3rem 2rem', cursor: 'pointer', minHeight: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem', transition: 'all 0.3s ease' }}
+            >
+              <p style={{ fontSize: '1.4rem', color: '#fff', margin: 0 }}>
+                {flipped ? cards[currentIndex].back : cards[currentIndex].front}
+              </p>
+            </div>
+            <p style={{ color: '#ccc', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+              {flipped ? 'Showing answer' : 'Click card to reveal answer'}
+            </p>
+            <div className="cta-buttons">
+              <button className="cta-button primary" onClick={nextCard} disabled={!flipped}>
+                {currentIndex + 1 >= cards.length ? 'Finish' : 'Next Card'}
+              </button>
+              <button className="cta-button secondary" onClick={() => { setSelectedDeck(null); }}>Quit</button>
+            </div>
+          </>
+        )}
+
+      </div>
+    </section>
+  );
 }
