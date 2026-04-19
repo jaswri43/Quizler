@@ -102,6 +102,7 @@ export default function StudyPage() {
           <>
             <h1>Study Mode</h1>
             <p>Pick a deck to study</p>
+            <p style={{ color: '#ccc', fontSize: '0.9rem', marginBottom: '1rem' }}>You'll gain 10 XP for each card studied</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
               {decks.map((deck) => (
                 <div key={deck.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', background: 'rgba(0,168,232,0.15)', border: '1px solid #00A8E8', borderRadius: '8px', padding: '1rem 1.5rem' }}>
