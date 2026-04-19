@@ -1,10 +1,13 @@
+// Home Page - Main landing page with profile info and leaderboard
 import { useState, useEffect } from 'react';
 import HeroSection from '../components/HeroSection.tsx';
 import RecentLevelups from '../components/RecentLevelups.tsx';
 
 export default function HomePage() {
+  // User profile data
   const [profile, setProfile] = useState<any>(null);
 
+  // Load user profile if logged in
   useEffect(() => {
     const user_id = localStorage.getItem('user_id');
     if (!user_id) return;

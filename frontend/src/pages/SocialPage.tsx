@@ -1,6 +1,8 @@
+// Social Page - User leaderboard and rankings
 import { useState, useEffect } from 'react';
 
 export default function SocialPage() {
+  // Leaderboard data from API
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
 
   useEffect(() => {

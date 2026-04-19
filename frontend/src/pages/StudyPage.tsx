@@ -1,6 +1,9 @@
+// Study Page - Flashcard Study Mode
+// Features: Deck selection, card studying with flip animation, XP rewards
 import { useState, useEffect } from 'react';
 
 export default function StudyPage() {
+  // State management
   const [decks, setDecks] = useState<any[]>([]);
   const [selectedDeck, setSelectedDeck] = useState<any>(null);
   const [cards, setCards] = useState<any[]>([]);
@@ -11,6 +14,7 @@ export default function StudyPage() {
   const [loadingCards, setLoadingCards] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Initialize - check auth and fetch decks
   useEffect(() => {
     const user_id = localStorage.getItem('user_id');
     if (!user_id) {
@@ -20,6 +24,7 @@ export default function StudyPage() {
     fetchDecks();
   }, []);
 
+  // Fetch user's available decks
   const fetchDecks = async () => {
     try {
       setError(null);
@@ -48,6 +53,7 @@ export default function StudyPage() {
     }
   };
 
+  // Start study session for selected deck
   const startGame = async (deck: any) => {
     try {
       setError(null);
@@ -81,6 +87,7 @@ export default function StudyPage() {
     }
   };
 
+  // Move to next card or finish if last card
   const nextCard = () => {
     if (currentIndex + 1 >= cards.length) {
       finishGame();
@@ -90,6 +97,7 @@ export default function StudyPage() {
     }
   };
 
+  // End study session and award XP
   const finishGame = async () => {
     const user_id = localStorage.getItem('user_id');
     const xp = cards.length * 10;

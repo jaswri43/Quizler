@@ -1,3 +1,4 @@
+// Recent Levelups Component - Scrolling bar showing recent leaderboard entries
 import { useEffect, useState } from 'react';
 
 interface LeaderboardUser {
@@ -7,8 +8,10 @@ interface LeaderboardUser {
 }
 
 export default function RecentLevelups() {
+  // Store leaderboard data
   const [recentUsers, setRecentUsers] = useState<LeaderboardUser[]>([]);
 
+  // Fetch leaderboard on mount
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {

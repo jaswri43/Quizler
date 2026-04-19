@@ -1,3 +1,4 @@
+# Classroom Routes - Manage classrooms and student enrollment
 import os
 import random
 import string
@@ -12,7 +13,7 @@ supabase = create_client(url, key)
 
 classrooms_bp = Blueprint('classrooms', __name__)
 
-# Allow teachers to create a sign up code for their classroom
+# Create new classroom with invite code
 @classrooms_bp.route('/api/classrooms', methods=['POST'])
 def create_classroom():
     """

@@ -1,21 +1,25 @@
+// Navbar Component - Top navigation with logo, links, and auth buttons
 import { Link, NavLink as RouterNavLink } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
-// individuual links in navbar
+// Navigation link type
 type NavLink = {
     label: string;
     href: string;
 }
 
-// whole navbar component
+// Navbar props type
 type NavbarProps = {
     title: string;
     links: NavLink[];
 }
 
+// Navbar with responsive layout and auth state
 function Navbar({links, title}: NavbarProps) {
+    // Track logged in username
     const [username, setUsername] = useState(localStorage.getItem('username'));
 
+    // Listen for auth changes (login/logout)
     useEffect(() => {
         const handleAuthChange = () => {
             setUsername(localStorage.getItem('username'));

@@ -1,3 +1,4 @@
+# Flashcard and Deck Routes - Create/read/update/delete decks and cards
 from flask import Blueprint, request, jsonify
 import os
 from supabase import create_client, Client
@@ -11,7 +12,7 @@ supabase = create_client(url, key)
 
 cards_bp = Blueprint('cards', __name__)
 
-#Creates a new deck
+# Create new flashcard deck
 @cards_bp.route('/api/decks', methods=['POST'])
 def create_deck():
     """

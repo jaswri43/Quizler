@@ -1,7 +1,8 @@
+// Hero Section Component - Main banner with CTA buttons and streak tracker
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-
+// Displays 5-day streak bonus progress
 const StreakBonusTracker = ({ currentStreak }: { currentStreak: number }) => {
   const progress = currentStreak % 5 === 0 && currentStreak > 0 ? 5 : currentStreak % 5;
   const daysLeft = 5 - progress;
