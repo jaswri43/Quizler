@@ -185,17 +185,14 @@ body {
 
 .levelups-scroll {
   display: flex;
-  width: max-content;
+  gap: 2.5rem;
+  width: fit-content;
   animation: scroll-continuous 30s linear infinite;
   will-change: transform;
 }
 
 .levelups-group {
-  display: flex;
-  gap: 2.5rem;
-  padding: 0 1rem;
-  flex-shrink: 0;
-  box-sizing: border-box;
+  display: none;
 }
 
 .levelup-card {

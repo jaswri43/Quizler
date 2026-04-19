@@ -15,7 +15,14 @@ leaderboard_bp = Blueprint('leaderboard', __name__)
 @leaderboard_bp.route('/api/leaderboard', methods=['GET'])
 def get_leaderboard():
     try:
-        response = supabase.table('Users').select('username, xp, level').eq('role', 'student').order('xp', desc=True).execute()
+        response = (
+            supabase.table('Users')
+            .select('username, xp, level')
+            .eq('role', 'student')
+            .order('xp', desc=True)
+            .limit(10)
+            .execute()
+        )
         return jsonify({"status": "success", "data": response.data}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500

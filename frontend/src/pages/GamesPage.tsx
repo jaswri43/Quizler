@@ -8,6 +8,8 @@ export default function GamesPage() {
   const [flipped, setFlipped] = useState(false);
   const [finished, setFinished] = useState(false);
   const [xpGained, setXpGained] = useState(0);
+  const [loadingCards, setLoadingCards] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const user_id = localStorage.getItem('user_id');
@@ -19,20 +21,55 @@ export default function GamesPage() {
   }, []);
 
   const fetchDecks = async () => {
-    const user_id = localStorage.getItem('user_id');
-    const response = await fetch(`http://127.0.0.1:5000/api/decks?user_id=${user_id}`);
-    const data = await response.json();
-    setDecks(data.data);
+    try {
+      setError(null);
+      const user_id = localStorage.getItem('user_id');
+      const url = user_id
+        ? `http://127.0.0.1:5000/api/decks?user_id=${user_id}`
+        : 'http://127.0.0.1:5000/api/decks';
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Deck fetch failed: ${response.status}`);
+      }
+      const data = await response.json();
+      setDecks(Array.isArray(data.data) ? data.data : []);
+    } catch (fetchError) {
+      console.error('Error fetching decks:', fetchError);
+      setError('Unable to load decks. Please refresh the page.');
+    }
   };
 
   const startGame = async (deck: any) => {
-    const response = await fetch(`http://127.0.0.1:5000/api/cards/${deck.id}`);
-    const data = await response.json();
-    setSelectedDeck(deck);
-    setCards(data.data);
-    setCurrentIndex(0);
-    setFlipped(false);
-    setFinished(false);
+    try {
+      setError(null);
+      setLoadingCards(true);
+      const response = await fetch(`http://127.0.0.1:5000/api/cards/${deck.id}`);
+      if (!response.ok) {
+        throw new Error(`Card fetch failed: ${response.status}`);
+      }
+      const data = await response.json();
+      if (!Array.isArray(data.data)) {
+        throw new Error('Unexpected card response');
+      }
+      setSelectedDeck(deck);
+      setCards(data.data);
+      setCurrentIndex(0);
+      setFlipped(false);
+      setFinished(false);
+      if (data.data.length === 0) {
+        setError('This deck has no cards yet.');
+      }
+    } catch (fetchError) {
+      console.error('Error fetching cards:', fetchError);
+      setError('Unable to load flashcards for this deck.');
+      setSelectedDeck(deck);
+      setCards([]);
+      setCurrentIndex(0);
+      setFlipped(false);
+      setFinished(false);
+    } finally {
+      setLoadingCards(false);
+    }
   };
 
   const nextCard = () => {
@@ -76,6 +113,10 @@ export default function GamesPage() {
           </>
         )}
 
+        {error && !selectedDeck && (
+          <p style={{ color: '#FFBABA', marginBottom: '1rem' }}>{error}</p>
+        )}
+
         {/* Finished screen */}
         {selectedDeck && finished && (
           <>
@@ -85,6 +126,16 @@ export default function GamesPage() {
             <div className="cta-buttons" style={{ marginTop: '1.5rem' }}>
               <button className="cta-button primary" onClick={() => startGame(selectedDeck)}>Study Again</button>
               <button className="cta-button secondary" onClick={() => { setSelectedDeck(null); setFinished(false); }}>Back to Decks</button>
+            </div>
+          </>
+        )}
+
+        {selectedDeck && !finished && cards.length === 0 && (
+          <>
+            <h1>{selectedDeck.title}</h1>
+            <p style={{ color: '#fff', marginTop: '1rem' }}>{loadingCards ? 'Loading cards…' : (error ?? 'No cards were found for this deck.')}</p>
+            <div className="cta-buttons" style={{ marginTop: '1.5rem' }}>
+              <button className="cta-button secondary" onClick={() => setSelectedDeck(null)}>Back to Decks</button>
             </div>
           </>
         )}
@@ -105,7 +156,7 @@ export default function GamesPage() {
               {flipped ? 'Showing answer' : 'Click card to reveal answer'}
             </p>
             <div className="cta-buttons">
-              <button className="cta-button primary" onClick={nextCard} disabled={!flipped}>
+              <button className="cta-button primary" onClick={nextCard}>
                 {currentIndex + 1 >= cards.length ? 'Finish' : 'Next Card'}
               </button>
               <button className="cta-button secondary" onClick={() => { setSelectedDeck(null); }}>Quit</button>
