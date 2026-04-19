@@ -23,18 +23,16 @@ export default function RecentLevelups() {
     fetchLeaderboard();
   }, []);
 
-  const items = recentUsers.length > 0 ? [...recentUsers, ...recentUsers] : [
-    { username: 'Top Learner', xp: 0, level: 1 },
-    { username: 'Study Star', xp: 0, level: 1 },
-    { username: 'Knowledge King', xp: 0, level: 1 },
-    { username: 'Quiz Champion', xp: 0, level: 1 },
-    { username: 'Brainiac', xp: 0, level: 1 },
+  const defaultUsers = [
     { username: 'Top Learner', xp: 0, level: 1 },
     { username: 'Study Star', xp: 0, level: 1 },
     { username: 'Knowledge King', xp: 0, level: 1 },
     { username: 'Quiz Champion', xp: 0, level: 1 },
     { username: 'Brainiac', xp: 0, level: 1 },
   ];
+
+  const usersToShow = recentUsers.length > 0 ? recentUsers : defaultUsers;
+  const items = Array.from({ length: 4 }, () => usersToShow).flat();
 
   return (
     <section className="levelups-section">

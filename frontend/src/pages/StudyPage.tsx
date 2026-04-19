@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export default function GamesPage() {
+export default function StudyPage() {
   const [decks, setDecks] = useState<any[]>([]);
   const [selectedDeck, setSelectedDeck] = useState<any>(null);
   const [cards, setCards] = useState<any[]>([]);
