@@ -57,13 +57,13 @@ function Navbar({links, title}: NavbarProps) {
                                 localStorage.clear(); // Clears everything
                                 window.location.href = '/login'; // Reboots the app to the login page
                             }}
-                            style={{ background: 'none', border: '1px solid white', color: 'white', cursor: 'pointer', borderRadius: '4px', padding: '2px 8px' }}
+                            className="auth-button"
                         >
                             Logout
                         </button>
                     </div>
                 ) : (
-                    <Link to="/login" className="user-icon">
+                    <Link to="/login" className="auth-button">
                         Login
                     </Link>
                 )}
