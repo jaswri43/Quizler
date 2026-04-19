@@ -174,8 +174,8 @@ body {
   background-color: #FF6600;
   color: #fff;
   border: none;
-  padding: 0.8em 2em;
-  font-size: 1rem;
+  padding: 0.5em 1.2em;
+  font-size: 0.9rem;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;

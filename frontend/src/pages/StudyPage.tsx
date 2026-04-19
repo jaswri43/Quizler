@@ -104,9 +104,9 @@ export default function StudyPage() {
             <p>Pick a deck to study</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
               {decks.map((deck) => (
-                <div key={deck.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,168,232,0.15)', border: '1px solid #00A8E8', borderRadius: '8px', padding: '1rem 1.5rem' }}>
-                  <span style={{ color: '#fff', fontWeight: 600 }}>{deck.title}</span>
-                  <button className="cta-button primary" onClick={() => startGame(deck)}>Study</button>
+                <div key={deck.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', background: 'rgba(0,168,232,0.15)', border: '1px solid #00A8E8', borderRadius: '8px', padding: '1rem 1.5rem' }}>
+                  <span style={{ color: '#fff', fontWeight: 600, flex: 1, minWidth: 0 }}>{deck.title}</span>
+                  <button className="cta-button primary" onClick={() => startGame(deck)} style={{ flexShrink: 0 }}>Study</button>
                 </div>
               ))}
             </div>

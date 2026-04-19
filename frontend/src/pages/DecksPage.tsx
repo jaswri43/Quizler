@@ -15,12 +15,15 @@ export default function DecksPage() {
   const [justAssignedId, setJustAssignedId] = useState<string | number | null>(null);
 
   useEffect(() => {
+    const user_id = localStorage.getItem('user_id');
+    if (!user_id) {
+      window.location.href = '/login';
+      return;
+    }
     fetchDecks();
     fetchAssignedDecks();
 
     const fetchRole = async () => {
-      const user_id = localStorage.getItem('user_id');
-      if (!user_id) return;
       const response = await fetch(`http://127.0.0.1:5000/api/users/${user_id}`);
       const data = await response.json();
       if (data.data && data.data.role) {
