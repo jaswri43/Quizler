@@ -1,3 +1,4 @@
+# Leaderboard Routes - Get user rankings and statistics
 from flask import Blueprint, jsonify
 import os
 from supabase import create_client
@@ -11,7 +12,7 @@ supabase = create_client(url, key)
 
 leaderboard_bp = Blueprint('leaderboard', __name__)
 
-# Returns top 10 users sorted by level
+# Get top users by level/XP
 @leaderboard_bp.route('/api/leaderboard', methods=['GET'])
 def get_leaderboard():
     try:

@@ -1,6 +1,9 @@
+// Decks Page - Create and Manage Flashcard Decks
+// Features: Create decks, add/edit cards, assign decks to classrooms
 import { useState, useEffect } from 'react';
 
 export default function DecksPage() {
+  // State management
   const [decks, setDecks] = useState<any[]>([]);
   const [selectedDeck, setSelectedDeck] = useState<any>(null);
   const [cards, setCards] = useState<any[]>([]);
@@ -14,6 +17,7 @@ export default function DecksPage() {
   const [userRole, setUserRole] = useState('student');
   const [justAssignedId, setJustAssignedId] = useState<string | number | null>(null);
 
+  // Initialize - check auth and fetch user data
   useEffect(() => {
     const user_id = localStorage.getItem('user_id');
     if (!user_id) {

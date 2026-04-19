@@ -1,3 +1,4 @@
+# Authentication Routes - Login and Register endpoints
 from flask import Blueprint, request, jsonify
 import os
 from supabase import create_client
@@ -12,7 +13,7 @@ supabase = create_client(url, key)
 
 auth_bp = Blueprint('auth', __name__)
 
-# Registers a new user with email, password, and username
+# User registration - create new account
 @auth_bp.route('/api/register', methods=['POST'])
 def register():
     data = request.json

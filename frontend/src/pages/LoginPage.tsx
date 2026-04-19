@@ -1,3 +1,5 @@
+// Login/Register Page - Authentication form
+// Features: Login for existing users, register for new users with role selection
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
